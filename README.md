@@ -1,83 +1,85 @@
-# AVM-SurroundView — 360° 全景环视拼接系统
+# AVM 360° 全景环视系统
 
-[![Python](https://img.shields.io/badge/Python-3.8+-3776AB?logo=python&logoColor=white)](https://python.org/)
-[![OpenCV](https://img.shields.io/badge/OpenCV-4.x-5C3EE8?logo=opencv)](https://opencv.org/)
-[![NumPy](https://img.shields.io/badge/NumPy-科学计算-013243?logo=numpy)](https://numpy.org/)
-[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+> 基于多摄像头图像拼接的车载全景环视（Around View Monitor）实现方案
 
-## 项目背景
+## 项目目的
 
-汽车全景环视系统（AVM, Around View Monitor）是现代车辆的重要辅助驾驶功能。通过车身四周安装的鱼眼摄像头（前、后、左、右），将四路画面拼接成一幅俯视视角的全景图像，让驾驶员直观看到车辆周围 360° 的环境，解决低速行驶和泊车时的视野盲区问题。
+倒车和低速场景下，驾驶员需要全方位了解车辆周围环境。本项目基于 4 路鱼眼摄像头，通过相机标定、畸变校正、透视变换和图像拼接，实时生成车辆的 360° 俯视全景图像，辅助驾驶员安全泊车和低速行驶。
 
-然而鱼眼镜头存在严重的畸变，四路画面的拼接需要精确的标定、去畸变和融合处理。本项目实现了一套完整的 AVM 图像处理流水线：从鱼眼镜头标定、畸变校正、透视变换到多路图像无缝拼接。
+## 解决的痛点
+
+- 单路倒车影像视角有限，存在盲区
+- 商用 AVM 方案成本高且不开源
+- 鱼眼畸变校正和多路图像无缝拼接的工程实现复杂
+- 拼接缝处的色差和过渡不自然
 
 ## 效果展示
 
-![360° 全景环视](docs/surround-view.png)
+### 标定与校正流程
 
-四路鱼眼摄像头画面经过去畸变和透视变换后，无缝拼接为车辆周围的俯视全景图。
+从原始鱼眼图像到畸变校正、透视变换的完整标定流程。
 
-## 核心功能
+![标定流程](docs/calibration_process.png)
 
-| 功能 | 说明 |
+### 处理管线架构
+
+4 路摄像头输入到全景拼接输出的完整数据处理流水线。
+
+![处理管线](docs/processing_pipeline.png)
+
+### 360° 全景拼接效果
+
+四路摄像头图像无缝拼接为车辆周围俯视图。
+
+![全景环视效果](docs/surround_view.png)
+
+## 技术方案
+
+| 步骤 | 实现方法 |
+|------|---------|
+| 相机标定 | 棋盘格标定法，提取内参和畸变系数 |
+| 畸变校正 | OpenCV fisheye 模型去畸变 |
+| 透视变换 | 单应性矩阵计算 BEV 视角 |
+| 图像拼接 | 加权融合 + 拉普拉斯金字塔混合 |
+| 亮度均衡 | 直方图均衡化消除色差 |
+| 实时渲染 | OpenGL 纹理映射加速 |
+
+## 系统参数
+
+| 参数 | 数值 |
 |------|------|
-| 鱼眼标定 | 棋盘格标定法获取相机内外参数 |
-| 畸变校正 | 鱼眼镜头径向/切向畸变去除 |
-| 透视变换 | 将各摄像头视角统一映射到俯视平面 |
-| 图像拼接 | 四路画面无缝融合，过渡区域平滑处理 |
-| 实时处理 | 优化算法支持视频流实时拼接 |
+| 输入分辨率 | 1280 × 720 × 4 路 |
+| 输出分辨率 | 1080 × 1080 |
+| 处理帧率 | ≥ 30 FPS |
+| 端到端延迟 | < 50ms |
+| 视野覆盖 | 360° 无盲区 |
 
-## 技术栈
+## 快速开始
 
-| 组件 | 技术 |
-|------|------|
-| 图像处理 | OpenCV 4.x |
-| 数学计算 | NumPy、SciPy |
-| 标定工具 | OpenCV Camera Calibration |
-| 可视化 | Matplotlib |
-| 语言 | Python 3.8+ |
+```bash
+git clone https://github.com/xiaofuqing13/AVM-SurroundView.git
+cd AVM-SurroundView
 
-## 处理流程
+pip install -r requirements.txt
 
-```
-鱼眼图像采集 → 相机标定 → 畸变校正 → 透视变换 → 图像拼接 → 全景输出
-     ↓              ↓           ↓           ↓          ↓
-  4路摄像头     内外参矩阵    去除桶形畸变   俯视映射    融合过渡区
+# 运行标定
+python calibrate.py --input calibration_images/
+
+# 运行拼接
+python surround_view.py --config config.yaml
 ```
 
 ## 项目结构
 
 ```
 AVM-SurroundView/
-├── calibration/                # 标定模块
-│   ├── calibrate.py            # 相机标定
-│   └── params/                 # 标定参数
-├── undistort/                  # 去畸变模块
-├── perspective/                # 透视变换
-├── stitching/                  # 图像拼接
-│   ├── stitch.py               # 拼接主逻辑
-│   └── blend.py                # 融合算法
-├── utils/                      # 工具函数
-├── images/                     # 测试图像
-├── main.py                     # 主入口
-├── requirements.txt
-└── README.md
-```
-
-## 快速开始
-
-```bash
-# 安装依赖
-pip install opencv-python numpy scipy matplotlib
-
-# 相机标定（需要棋盘格标定图）
-python calibration/calibrate.py --images calibration/images/ --output calibration/params/
-
-# 运行全景拼接
-python main.py --input images/ --output output/surround_view.png
-
-# 实时视频拼接
-python main.py --video --cameras 0 1 2 3
+├── calibrate.py        # 相机标定
+├── undistort.py        # 畸变校正
+├── perspective.py      # 透视变换
+├── stitcher.py         # 图像拼接
+├── surround_view.py    # 主程序
+├── config/             # 配置文件
+└── docs/               # 文档截图
 ```
 
 ## 开源协议
