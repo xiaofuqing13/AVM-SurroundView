@@ -1,5 +1,8 @@
 # AVM 360° 全景环视系统
 
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=Python&logoColor=white) ![GitHub](https://img.shields.io/badge/GitHub-Repo-181717?style=flat-square&logo=github)
+
+
 > 基于多摄像头图像拼接的车载全景环视（Around View Monitor）实现方案
 
 ## 项目目的
@@ -84,4 +87,4 @@ AVM-SurroundView/
 
 ## 开源协议
 
-MIT License
+MIT 许可证
