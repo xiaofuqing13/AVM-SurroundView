@@ -1,4 +1,4 @@
-<![CDATA[# 🚙 AVM-SurroundView — 360° 全景环视系统
+# 🚙 AVM-SurroundView — 360° 全景环视系统
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.8+-3776AB?logo=python&logoColor=white" alt="Python">
@@ -101,4 +101,3 @@ python main_gui.py
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
-]]>
