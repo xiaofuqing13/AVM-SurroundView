@@ -31,7 +31,7 @@
 
 四路摄像头图像无缝拼接为车辆周围俯视图。
 
-![全景环视效果](docs/surround_view.png)
+![全景环视效果](docs/surround-view.png)
 
 ## 技术方案
 
